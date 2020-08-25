@@ -1,4 +1,9 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Under construction
+
+## php-json-api-test-app
+Just testing and demo client for [ristep/php-json-api](https://github.com/ristep/php-json-api).
+
 
 ## Available Scripts
 
