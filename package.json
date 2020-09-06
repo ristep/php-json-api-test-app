@@ -1,5 +1,5 @@
 {
-  "homepage": "/build",
+  "homepage": "#/",
   "name": "php-json-api-test-app",
   "version": "0.1.0",
   "private": true,

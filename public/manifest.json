@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "JsonAPI-test",
+  "name": "Testing app fo ristep/php-json-api",
   "icons": [
     {
       "src": "favicon.ico",
