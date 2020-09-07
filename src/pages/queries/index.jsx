@@ -2,18 +2,10 @@ import React, { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import ReactJson from "react-json-view";
 
-import axios from "axios";
 import { Card, Table, Tabs, Tab } from "react-bootstrap";
 import { useParams, Link } from "react-router-dom";
 
-const axParams = {
-  baseURL: "http://phptest.sman/php-json-api/",
-  headers: {
-    Authorization: "dummy-key",
-    "Content-type": "application/json",
-  },
-};
-const Axios = axios.create(axParams);
+import Axios from "Axios";
 
 const rq = (rqID) => ({
   Get: {

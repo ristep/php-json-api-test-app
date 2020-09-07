@@ -1,25 +1,40 @@
 import React from "react";
-import { Container, Row, Col, Image } from "react-bootstrap";
+import {  Image, Card, CardDeck, CardGroup, CardColumns } from "react-bootstrap";
 
 const Home = () => {
+
+  const Dibe = () => (
+    [
+      'Primary',
+      'Secondary',
+      'Success',
+      'Danger',
+      'Warning',
+      'Info',
+      'Light',
+      'Dark',
+    ].map((variant, idx) => (
+      <Card>
+        <Card.Body>
+          <Card.Title>{variant} Card Title </Card.Title>
+          <Card.Img src="https://foodb.ca/system/foods/pictures/122/full/122.png" large />
+          <Card.Text>
+            Some quick example text to build on the card title and make up the bulk
+            of the card's content.
+          </Card.Text>
+        </Card.Body>
+        <Card.Footer>Footer</Card.Footer>
+      </Card>
+    ))
+    
+  );
+
   return (
-    <>
-    {/* <h2>Just an sumple photos</h2> */}
-    <Container className="appBody">
-      <Row>
-        <Col xs={6} md={4}>
-          <Image src="https://foodb.ca/system/foods/pictures/121/full/121.png" rounded />
-        </Col>
-        <Col xs={6} md={4}>
-          <Image src="https://foodb.ca/system/foods/pictures/119/full/119.png" roundedCircle />
-        </Col>
-        <Col xs={6} md={4}>
-          <Image src="https://foodb.ca/system/foods/pictures/117/full/117.png" thumbnail />
-        </Col>
-      </Row>
-    </Container>
-    </> 
-  )
+    <CardColumns>
+      <Dibe />
+    </CardColumns>
+ );
+
 }
 
 export default Home;

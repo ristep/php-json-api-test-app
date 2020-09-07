@@ -5,16 +5,11 @@ import Button from "react-bootstrap/Button";
 import Navbar from "react-bootstrap/Navbar";
 import { Nav, NavLink  } from "react-bootstrap";
 
-import Home from "./pages/home";
+import Home from "pages/home";
 
-import {
-  HashRouter as Router,
-  Switch,
-  Route,
-  Link,
-} from "react-router-dom";
-import Queries from "./pages/queries";
-import About from "./pages/about";
+import { HashRouter as Router, Switch, Route } from "react-router-dom";
+import Queries from "pages/queries";
+import About from "pages/about";
 
 const themes = [
   { title: "Spacelab", path: "/styles/Spacelab/main.css" },
