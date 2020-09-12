@@ -117,7 +117,7 @@ const Queries = () => {
             </Table>
           </Card>
         </Tab>
-        <Tab eventKey="Result" title=" Queri ">
+        <Tab eventKey="Result" title=" Query ">
           <Card>
             <h5>Record ID: {rqID}</h5>
             <ReactJson
@@ -137,6 +137,7 @@ const Queries = () => {
           </Card>
           <div className="card">
             <ReactJson name={false} src={result} />
+            {/* <ReactJson name={false} src={{baseURL:Axios.defaults.baseURL}} /> */}
           </div>
         </Tab>
       </Tabs>

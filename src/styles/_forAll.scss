@@ -1,0 +1,57 @@
+
+// $card-column-sizes: (
+//     xs: 1,
+//     sm: 2,
+//     md: 3,
+//     lg: 5,
+// );
+
+// @each $breakpoint-size, $column-count in $card-column-sizes {
+//     @include media-breakpoint-up($breakpoint-size) {
+//       .card-columns {
+//         column-count: $column-count;
+//         column-gap: 1rem;
+
+//         .card {
+//           display: inline-block;
+//           width: 100%; // Don't let them exceed the column width
+//         }
+//       }
+//     }
+// }
+
+// $card-column-counts: 1, 2, 3, 4, 5;
+
+// .card-columns {
+//     @each $column-count in $card-column-counts {
+//         &.card-columns-#{$column-count} {
+//             column-count: $column-count;
+//         }
+//     }
+
+//     @each $breakpoint in map-keys($grid-breakpoints) {
+//         @include media-breakpoint-up($breakpoint) {
+//             $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+//             @each $column-count in $card-column-counts {
+//                 &.card-columns#{$infix}-#{$column-count} {
+//                     column-count: $column-count;
+//                 }
+//             }
+//         }
+//     }
+// }
+
+.card-columns {
+  @include media-breakpoint-only(xl) {
+    column-count: 5;
+  }
+  @include media-breakpoint-only(lg) {
+    column-count: 4;
+  }
+  @include media-breakpoint-only(md) {
+    column-count: 3;
+  }
+  @include media-breakpoint-only(sm) {
+    column-count: 2;
+  }
+}

@@ -1,4 +1,4 @@
-import "./App.scss";
+import "App.scss";
 
 import React, { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
@@ -10,6 +10,8 @@ import Home from "pages/home";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import Queries from "pages/queries";
 import About from "pages/about";
+import Food from "pages/food";
+import Foods from "pages/foods";
 
 const themes = [
   { title: "Spacelab", path: "/styles/Spacelab/main.css" },
@@ -40,17 +42,20 @@ function App() {
   return (
     <div className="App">
       <link rel="stylesheet" type="text/css" href={process.env.PUBLIC_URL + themes[styleIndex].path}></link>
+      {/* <link rel="stylesheet" type="text/css" href={process.env.PUBLIC_URL+"styles/App.scss"}></link> */}
       <Router>
 
         <header className="App-header">
-          <Navbar bg="primary" expand="lg" className="navbar-dark" >
+          <Navbar bg="primary" expand="lg" className="navbar-dark">
             <Navbar.Brand>Json API test</Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="mr-auto">
                 <NavLink href="#/home">Home</NavLink>
+                <NavLink href="#/foods">Foods</NavLink>
                 <NavLink href="#/queries">Requests</NavLink>
                 <NavLink href="#/about">About</NavLink>
+                {/* <NavLink href="#/food">About</NavLink> */}
                 {/* <NavDropdown title="Queries" id="basic-nav-dropdown">
                 <NavDropdown.Item href="#hr01" onClick={() => setRequest(getUser)}>User id:3 </NavDropdown.Item>
                 <NavDropdown.Item href="#hr02" onClick={() => setRequest(getUser4all)}>User id:5 all Fields</NavDropdown.Item>
@@ -68,6 +73,9 @@ function App() {
 
         </header>
         <Switch>
+          <Route path="/food/:foodID">
+            <Food />
+          </Route>
           <Route path="/about">
             <About />
           </Route>
@@ -76,6 +84,9 @@ function App() {
           </Route>
           <Route path="/queries" >
             <Queries />
+          </Route>
+          <Route path="/foods" >
+            <Foods />
           </Route>
           <Route path="/">
             <Home />
