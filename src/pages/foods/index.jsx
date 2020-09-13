@@ -3,13 +3,17 @@ import { Card, Container, Col, Row, Pagination, Navbar, Form, FormControl, Butto
 
 import Axios from "Axios";
 
-const flr = (page) => (
+const flr = (page,params) => (
   {
-    "Listing": {
-      "type": "foods",
-      "attributes": [
+    Listing: {
+      type: "foods",
+      attributes: [
         "id", "name", "description", "name_scientific", "wikipedia_id", "food_group", "food_subgroup", "food_type", "public_id"
       ],
+      filter:{
+        template:"name like :par1 or name_scientific like :par2",
+        params
+      },
       page
     }
   }
@@ -17,9 +21,11 @@ const flr = (page) => (
 
 const Foods = () => {
   const [foods, setFoods] = useState([]);
-  const [page, setPage] = useState({ limit: 10, offset: 0 })
-  const [pageMeta, setPageMeta] = useState({ size: 10, cur: 1, count: 992, pages: 992 / 10 })
-  const [count, setCount] = useState(0);
+  const [search, setSearch ] = useState("");
+  const [page, setPage] = useState({ limit: 10, offset: 0 });
+  const [params, setParams] = useState({ par1:"%%",  par2:"%%"}); //filter parameters
+  const [pageMeta, setPageMeta] = useState({ size: 10, cur: 0, count: 992, pages: 992 / 10 });
+  // const [count, setCount] = useState(0);
 
   const nextPage = () => {
     setPageMeta({ ...pageMeta, cur: pageMeta.cur + 1 });
@@ -28,6 +34,10 @@ const Foods = () => {
   const prevPage = () => {
     setPageMeta({ ...pageMeta, cur: pageMeta.cur - 1 });
   }
+
+  const searchClick = () => {
+    setParams({ par1:"%"+search+"%" , par2: "%"+search+"%"});
+  };
 
   useEffect(() => {
     setPage({ limit: pageMeta.size , offset: pageMeta.size * pageMeta.cur });
@@ -42,18 +52,29 @@ const Foods = () => {
 
       <Pagination.Next onClick={() => nextPage(page, pageMeta)} />
       <Pagination.Last />
-      <Button onClick={() => setCount(count + 1)}>klink {count}</Button>
+      {/* <Button onClick={() => setCount(count + 1)}>klink {count}</Button> */}
     </Pagination>
   );
 
-  const Navi2 = () => (
+  useEffect(() => {
+    (async () => {
+      await Axios.post("", flr(page,params)).then((result) => {
+        setFoods(result.data.data);
+      });
+    })();
+
+  }, [page,params]);
+
+
+  return (
+  <>
     <Navbar className="bg-light justify-content-between">
       <Navbar.Collapse id="basic-navbar-nav">
         <Container className=" fluid" >
           <Row>
             <Form inline >
-              <FormControl type="text" placeholder="Search" />
-              <Button type="submit">Submit</Button>
+              <FormControl type="text" placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} />
+              <Button onClick={()=>searchClick() } >Search</Button>
             </Form>
           </Row>
           <Row>
@@ -62,20 +83,6 @@ const Foods = () => {
         </Container>
       </Navbar.Collapse>
     </Navbar>
-  );
-
-  useEffect(() => {
-    (async () => {
-      await Axios.post("", flr(page)).then((result) => {
-        setFoods(result.data.data);
-      });
-    })();
-
-  }, [page]);
-
-
-  return (<>
-    <Navi2 />
     <hr />
     <Container className="card-columns card-columns-2 card-columns-md-3 card-columns-xl-4">
 
