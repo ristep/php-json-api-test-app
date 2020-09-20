@@ -24,10 +24,16 @@ const foodList = (page, search ) => ({
 });
 
 const Foods = () => {
-  const { filterPar, pageSizePar, pagePar } = useParams(); 
+  const { filterPar="", pageSizePar=5, pagePar=1 } = useParams(); 
+  
   const [result, setResult] = useState({ OK: false, count:0, data:[] });
   const [page, setPage] = useState({ limit: pageSize, offset: 0 });
   const [search, setSearch] = useState("");
+
+  // useEffect(()=>{
+  //   setSearch(filterPar);    
+  //   setPage( p => ({...p, offset:pagePar*pageSizePar, limit:pageSizePar }));
+  // },[ filterPar, pageSizePar, pagePar ])
 
   const nextPage = () => {
     const offset = page.offset + page.limit >= result.recordCount ? page.offset :  page.offset + page.limit;
