@@ -1,70 +1,78 @@
 import React, { useEffect, useState } from "react";
-import { Card, Container, Col, Row, Pagination, Navbar, Form, FormControl, Button } from "react-bootstrap";
+import { Card, Container, Col, Row, Pagination, Navbar, Form, FormControl, FormText } from "react-bootstrap";
 
 import Axios from "Axios";
+import { useParams } from "react-router-dom";
 
-const flr = (page,params) => (
-  {
-    Listing: {
+const pageSize = 5;
+
+const foodList = (page, search ) => ({
+    MetaList:{
       type: "foods",
       attributes: [
         "id", "name", "description", "name_scientific", "wikipedia_id", "food_group", "food_subgroup", "food_type", "public_id"
       ],
       filter:{
         template:"name like :par1 or name_scientific like :par2",
-        params
+        params:{
+          par1: "%"+search+"%",
+          par2: "%"+search+"%"
+        }
       },
       page
     }
-  }
-);
+});
 
 const Foods = () => {
-  const [foods, setFoods] = useState([]);
-  const [search, setSearch ] = useState("");
-  const [page, setPage] = useState({ limit: 10, offset: 0 });
-  const [params, setParams] = useState({ par1:"%%",  par2:"%%"}); //filter parameters
-  const [pageMeta, setPageMeta] = useState({ size: 10, cur: 0, count: 992, pages: 992 / 10 });
-  // const [count, setCount] = useState(0);
+  const { filterPar, pageSizePar, pagePar } = useParams(); 
+  const [result, setResult] = useState({ OK: false, count:0, data:[] });
+  const [page, setPage] = useState({ limit: pageSize, offset: 0 });
+  const [search, setSearch] = useState("");
 
   const nextPage = () => {
-    setPageMeta({ ...pageMeta, cur: pageMeta.cur + 1 });
+    const offset = page.offset + page.limit >= result.recordCount ? page.offset :  page.offset + page.limit;
+    setPage({ ...page, offset });
   }
 
   const prevPage = () => {
-    setPageMeta({ ...pageMeta, cur: pageMeta.cur - 1 });
+    const offset = page.offset - page.limit < 0 ? page.offset : page.offset - page.limit;
+    setPage({ ...page, offset });
   }
 
-  const searchClick = () => {
-    setParams({ par1:"%"+search+"%" , par2: "%"+search+"%"});
+  const firstPage = () => {
+    setPage({ ...page, offset: 0 });
+  };
+
+  const lastPage = () => {
+    if( result.recordCount%page.limit>0 ) 
+      setPage({ ...page, offset: Math.floor(result.recordCount/page.limit)*page.limit});
+    else  
+      setPage({ ...page, offset: Math.floor(result.recordCount/page.limit*page.limit) - page.limit });
   };
 
   useEffect(() => {
-    setPage({ limit: pageMeta.size , offset: pageMeta.size * pageMeta.cur });
-  },[pageMeta] );
-
-  const Pagi = () => (
-    <Pagination style={{ marginTop: "10px" }}>
-      <Pagination.First />
-      <Pagination.Prev onClick={() => prevPage()} />
-
-      <Pagination.Item>{pageMeta.cur}</Pagination.Item>
-
-      <Pagination.Next onClick={() => nextPage(page, pageMeta)} />
-      <Pagination.Last />
-      {/* <Button onClick={() => setCount(count + 1)}>klink {count}</Button> */}
-    </Pagination>
-  );
-
-  useEffect(() => {
     (async () => {
-      await Axios.post("", flr(page,params)).then((result) => {
-        setFoods(result.data.data);
+      await Axios.post("", foodList( page, search )).then((ret) => {
+        if( ret.data.OK ){
+          setResult( ret.data );
+        }  
       });
     })();
+  }, [ search, page ]);
 
-  }, [page,params]);
+  useEffect( () =>
+    setPage( p => ({...p, offset: 0 } ) )
+  ,[result.recordCount]);
 
+  const Pagi = () => (
+    <Pagination hidden={result.recordCount<=page.limit} style={{ marginTop: "10px" }}>
+      <Pagination.First onClick={() => firstPage()} />
+      <Pagination.Prev onClick={() => prevPage()} />
+      <Pagination.Item disabled >Page {page.offset/page.limit+1} of {Math.ceil(result.recordCount/page.limit)}</Pagination.Item>
+      <Pagination.Next onClick={() => nextPage()} />
+      <Pagination.Last onClick={() => lastPage()} />
+    </Pagination>
+  );
 
   return (
   <>
@@ -74,7 +82,9 @@ const Foods = () => {
           <Row>
             <Form inline >
               <FormControl type="text" placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} />
-              <Button onClick={()=>searchClick() } >Search</Button>
+              <FormText id="passwordHelpBlock" style={{ marginLeft: "10px" }}>
+                Items found: {result.recordCount}
+              </FormText>
             </Form>
           </Row>
           <Row>
@@ -82,11 +92,11 @@ const Foods = () => {
           </Row>
         </Container>
       </Navbar.Collapse>
-    </Navbar>
-    <hr />
+    </Navbar> 
+   
     <Container className="card-columns card-columns-2 card-columns-md-3 card-columns-xl-4">
 
-      {foods.map((variant, idx) => (
+      { result.data.map((variant, idx) => (
         <Card key={idx}>
           <Card.Body>
             <Card.Title>
@@ -113,8 +123,10 @@ const Foods = () => {
             </Card.Text>
           </Card.Body>
         </Card>
-      ))}
-
+      ))} 
+      <h3>filter: {filterPar}</h3> 
+      <h3>pageSize: {pageSizePar}</h3> 
+      <h3>page: {pagePar}</h3> 
     </Container>
   </>
   );

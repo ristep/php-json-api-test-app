@@ -30,7 +30,7 @@ const Queries = () => {
   let { rqID } = useParams();
   const [request, setRequest] = useState();
   const [result, setResult] = useState();
-  const [tabela, setTabela] = useState();
+  const [tabela, setTabela] = useState({});
   const [tabKey, setTabKey] = useState();
 
   useEffect(() => {
@@ -52,16 +52,7 @@ const Queries = () => {
       setTabela('');
       await Axios.post("", lrq).then((ret) => {
 
-        setTabela(
-          Array.from(ret.data.data).map((value, index) =>
-            <tr key={index}>
-              <td>{value.id}</td>
-              {/*<td><Link to={"/queries/"+value.id}>{value.title}</td> */}
-               <td><Link to={"/queries/"+value.id}>{value.title}</Link> </td>
-              <td>{value.comment}</td>
-            </tr>
-          )
-        );
+        setTabela( data => (ret.data.data));
 
       });
 
@@ -112,10 +103,18 @@ const Queries = () => {
                 </tr>
               </thead>
               <tbody>
-                {tabela}
+                {Array.from(tabela).map((value, index) =>
+                  <tr key={index}>
+                    <td>{value.id}</td>
+                    {/*<td><Link to={"/queries/"+value.id}>{value.title}</td> */}
+                    <td><Link to={"/queries/" + value.id}>{value.title}</Link> </td>
+                    <td>{value.comment}</td>
+                  </tr>
+                )}
               </tbody>
             </Table>
           </Card>
+          <ReactJson src={tabela} name={false} />
         </Tab>
         <Tab eventKey="Result" title=" Query ">
           <Card>

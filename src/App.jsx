@@ -3,7 +3,7 @@ import "App.scss";
 import React, { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Navbar from "react-bootstrap/Navbar";
-import { Nav, NavLink  } from "react-bootstrap";
+import { Nav, NavLink } from "react-bootstrap";
 
 import Home from "pages/home";
 
@@ -55,14 +55,6 @@ function App() {
                 <NavLink href="#/foods">Foods</NavLink>
                 <NavLink href="#/queries">Requests</NavLink>
                 <NavLink href="#/about">About</NavLink>
-                {/* <NavLink href="#/food">About</NavLink> */}
-                {/* <NavDropdown title="Queries" id="basic-nav-dropdown">
-                <NavDropdown.Item href="#hr01" onClick={() => setRequest(getUser)}>User id:3 </NavDropdown.Item>
-                <NavDropdown.Item href="#hr02" onClick={() => setRequest(getUser4all)}>User id:5 all Fields</NavDropdown.Item>
-                <NavDropdown.Item href="#hr03" onClick={() => setRequest(getUsersPage)}>Users pagination</NavDropdown.Item>
-                <NavDropdown.Divider />
-                <NavDropdown.Item href="#hr04" onClick={() => setRequest(getFoodsAllAll)}>Foods all, all attributes </NavDropdown.Item>
-              </NavDropdown> */}
               </Nav>
               <Button type="button" onClick={handleButtonClick}>
                 Click to change theme: {themes[styleIndex].title}
@@ -79,13 +71,16 @@ function App() {
           <Route path="/about">
             <About />
           </Route>
-          <Route path="/queries/:rqID" >
+          <Route path="/queries/:rqID">
             <Queries />
           </Route>
-          <Route path="/queries" >
+          <Route path="/queries">
             <Queries />
           </Route>
-          <Route path="/foods" >
+          <Route path="/foods/:filterPar/:pageSizePar/:pagePar">
+            <Foods />
+          </Route>
+          <Route path="/foods">
             <Foods />
           </Route>
           <Route path="/">
