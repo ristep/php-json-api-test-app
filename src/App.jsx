@@ -15,6 +15,8 @@ import Foods from "pages/foods";
 
 const themes = [
   { title: "Spacelab", path: "/styles/Spacelab/main.css" },
+  { title: "Flatly", path: "/styles/Flatly/main.css" },
+  { title: "United", path: "/styles/United/main.css" },
   { title: "Sketchy Light", path: "/styles/sketchy-light/main.css" },
   { title: "Sketchy Dark", path: "/styles/sketchy-dark/main.css" },
   { title: "Cyborg", path: "/styles/cyborg/main.css" },
@@ -41,12 +43,12 @@ function App() {
 
   return (
     <div className="App">
-      <link rel="stylesheet" type="text/css" href={process.env.PUBLIC_URL + themes[styleIndex].path}></link>
+      <link rel="stylesheet" type="text/css" href={process.env.PUBLIC_URL + themes[styleIndex].path} />
       {/* <link rel="stylesheet" type="text/css" href={process.env.PUBLIC_URL+"styles/App.scss"}></link> */}
       <Router>
 
         <header className="App-header">
-          <Navbar bg="primary" expand="lg" className="navbar-dark">
+          <Navbar className="navbar-dark bg-primary" expand="lg">
             <Navbar.Brand>Json API test</Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
@@ -77,7 +79,7 @@ function App() {
           <Route path="/queries">
             <Queries />
           </Route>
-          <Route path="/foods/:filterPar/:pageSizePar/:pagePar">
+          <Route path="/foods/:searchPar/:pageSizePar/:pagePar">
             <Foods />
           </Route>
           <Route path="/foods">

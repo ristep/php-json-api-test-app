@@ -3,10 +3,11 @@ import { Card, Container, Col, Row, Pagination, Navbar, Form, FormControl, FormT
 
 import Axios from "Axios";
 import { useParams } from "react-router-dom";
+// import ReactJson from "react-json-view";
 
-const pageSize = 5;
+const PAGE_SIZE = 5;
 
-const foodList = (page, search ) => ({
+const foodList = ( search, pgSize, offset ) => ({
     MetaList:{
       type: "foods",
       attributes: [
@@ -19,62 +20,74 @@ const foodList = (page, search ) => ({
           par2: "%"+search+"%"
         }
       },
-      page
+      page:{
+        limit: pgSize,
+        offset: offset
+      }
     }
 });
 
 const Foods = () => {
-  const { filterPar="", pageSizePar=5, pagePar=1 } = useParams(); 
   
-  const [result, setResult] = useState({ OK: false, count:0, data:[] });
-  const [page, setPage] = useState({ limit: pageSize, offset: 0 });
-  const [search, setSearch] = useState("");
+  const { searchPar="__NaN__", pageSizePar=PAGE_SIZE, pagePar=0 } = useParams(); 
 
-  // useEffect(()=>{
-  //   setSearch(filterPar);    
-  //   setPage( p => ({...p, offset:pagePar*pageSizePar, limit:pageSizePar }));
-  // },[ filterPar, pageSizePar, pagePar ])
+  const [result, setResult] = useState({ OK: false, count:0, data:[] });
+  const [search, setSearch] = useState("");
+  const [maxPage, setMaxPage] = useState(0);
+  
+  const goto = ( search, size, page) => {
+    const src = ""===search ? "__NaN__" : search;
+    window.location.assign("#/foods/"+src+"/"+parseInt(size)+"/"+parseInt(page))
+  };
 
   const nextPage = () => {
-    const offset = page.offset + page.limit >= result.recordCount ? page.offset :  page.offset + page.limit;
-    setPage({ ...page, offset });
+    const page = parseInt(pagePar) === maxPage ? parseInt(pagePar) :  parseInt(pagePar)+1;
+    goto(searchPar,pageSizePar,page);
   }
 
   const prevPage = () => {
-    const offset = page.offset - page.limit < 0 ? page.offset : page.offset - page.limit;
-    setPage({ ...page, offset });
+    const page =  parseInt(pagePar) === 0 ? parseInt(pagePar) : parseInt(pagePar) - 1;
+    goto(searchPar, pageSizePar, page);
   }
 
   const firstPage = () => {
-    setPage({ ...page, offset: 0 });
+    goto(searchPar, pageSizePar, 0);
   };
 
   const lastPage = () => {
-    if( result.recordCount%page.limit>0 ) 
-      setPage({ ...page, offset: Math.floor(result.recordCount/page.limit)*page.limit});
-    else  
-      setPage({ ...page, offset: Math.floor(result.recordCount/page.limit*page.limit) - page.limit });
+    goto(searchPar, pageSizePar, maxPage );
   };
 
+  useEffect( () => {
+    if(pagePar>maxPage) 
+      goto(searchPar, pageSizePar, maxPage);
+  }, [searchPar, pageSizePar, pagePar, maxPage ])
+  
   useEffect(() => {
+    goto(search, pageSizePar, pagePar);
+  }, [search, pageSizePar, pagePar ]);
+
+  useEffect(() => {
+    const src = "__NaN__"===searchPar ? "" : searchPar;
+    setSearch(src);
     (async () => {
-      await Axios.post("", foodList( page, search )).then((ret) => {
+      await Axios.post("", foodList( src, pageSizePar, pagePar*pageSizePar )).then((ret) => {
         if( ret.data.OK ){
           setResult( ret.data );
         }  
       });
     })();
-  }, [ search, page ]);
+  }, [  searchPar, pageSizePar, pagePar ]);
 
-  useEffect( () =>
-    setPage( p => ({...p, offset: 0 } ) )
-  ,[result.recordCount]);
+  useEffect( () => {
+     setMaxPage( result.recordCount%pageSizePar>0 ? Math.floor(result.recordCount/pageSizePar) : Math.floor(result.recordCount/pageSizePar-1) );
+  },[result.recordCount, pageSizePar]);
 
   const Pagi = () => (
-    <Pagination hidden={result.recordCount<=page.limit} style={{ marginTop: "10px" }}>
+    <Pagination hidden={result.recordCount<=pageSizePar} style={{ marginTop: "10px" }}>
       <Pagination.First onClick={() => firstPage()} />
       <Pagination.Prev onClick={() => prevPage()} />
-      <Pagination.Item disabled >Page {page.offset/page.limit+1} of {Math.ceil(result.recordCount/page.limit)}</Pagination.Item>
+      <Pagination.Item disabled >Page {parseInt(pagePar)+1} of {Math.ceil(result.recordCount/pageSizePar)}</Pagination.Item>
       <Pagination.Next onClick={() => nextPage()} />
       <Pagination.Last onClick={() => lastPage()} />
     </Pagination>
@@ -88,7 +101,7 @@ const Foods = () => {
           <Row>
             <Form inline >
               <FormControl type="text" placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} />
-              <FormText id="passwordHelpBlock" style={{ marginLeft: "10px" }}>
+              <FormText style={{ marginLeft: "10px" }}>
                 Items found: {result.recordCount}
               </FormText>
             </Form>
@@ -130,9 +143,7 @@ const Foods = () => {
           </Card.Body>
         </Card>
       ))} 
-      <h3>filter: {filterPar}</h3> 
-      <h3>pageSize: {pageSizePar}</h3> 
-      <h3>page: {pagePar}</h3> 
+      {/* <ReactJson src={{ searchPar, pageSizePar, pagePar, maxPage }} /> */}
     </Container>
   </>
   );
