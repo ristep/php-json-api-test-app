@@ -20,7 +20,7 @@ const themes = [
   { title: "Sketchy Light", path: "/styles/sketchy-light/main.css" },
   { title: "Sketchy Dark", path: "/styles/sketchy-dark/main.css" },
   { title: "Cyborg", path: "/styles/cyborg/main.css" },
-  { title: "Lumen", path: "/styles/lumen/lumen.css" },
+  { title: "Lumen", path: "/styles/lumen/main.css" },
   { title: "Cerulean", path: "/styles/Cerulean/main.css" },
   { title: "Minty", path: "/styles/Minty/main.css" },
   { title: "Darkly", path: "/styles/Darkly/main.css" },
