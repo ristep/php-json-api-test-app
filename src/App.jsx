@@ -45,7 +45,7 @@ function App() {
     <div className="App">
       <link rel="stylesheet" type="text/css" href={process.env.PUBLIC_URL + themes[styleIndex].path} />
       {/* <link rel="stylesheet" type="text/css" href={process.env.PUBLIC_URL+"styles/App.scss"}></link> */}
-      <Router>
+      <Router basename="#/">
 
         <header className="App-header">
           <Navbar className="navbar-dark bg-primary" expand="lg">
@@ -79,7 +79,7 @@ function App() {
           <Route path="/queries">
             <Queries />
           </Route>
-          <Route path="/foods/:searchPar/:pageSizePar/:pagePar">
+          <Route path="/foods/:search/:size/:page">
             <Foods />
           </Route>
           <Route path="/foods">
