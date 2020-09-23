@@ -51,9 +51,7 @@ const Queries = () => {
     (async () => {
       setTabela('');
       await Axios.post("", lrq).then((ret) => {
-
         setTabela( data => (ret.data.data));
-
       });
 
     })();
