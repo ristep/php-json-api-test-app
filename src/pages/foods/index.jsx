@@ -1,11 +1,13 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Card, Container, Col, Row, Pagination, Navbar, Form, FormControl, FormText } from "react-bootstrap";
 
 import Axios from "Axios";
 import { useParams } from "react-router-dom";
+import { BackButton } from "components/backButton";
 
 const PAGE_SIZE = 5;
 const N0N = "-none-";
+const BaseURL = "#/foods/"
 
 const foodList = (search, pgSize, offset) => ({
   MetaList: {
@@ -28,84 +30,61 @@ const foodList = (search, pgSize, offset) => ({
 });
 
 const Foods = () => {
-  const { searchPar = N0N, pageSizePar = PAGE_SIZE, pagePar = 0 } = useParams();
+  const par = useParams();
+
+  const [navi, setNavi] = useState({});
+  const [prms, setPrms] = useState({});
   const [result, setResult] = useState({ OK: false, count: 0, data: [] });
   const [search, setSearch] = useState("");
-  const [maxPage, setMaxPage] = useState(0);
-
-  const fetchData = useCallback(() => {
-    const src = N0N === searchPar ? "" : searchPar;
-    (async () => {
-      await Axios.post("", foodList( src, pageSizePar, pagePar * pageSizePar)).then((ret) => {
-        if (ret.data.OK) {
-          setResult(ret.data);
-        }
-      });
-    })();
-
-  }, [searchPar, pageSizePar, pagePar] );  
-
-  const goto = (search, size, page) => {
-    const src = "" === search ? N0N : search;
-    window.location.assign("#/foods/" + src + "/" + parseInt(size) + "/" + parseInt(page))
-  };
-
-  const nextPage = () => {
-    const page = parseInt(pagePar) === maxPage ? parseInt(pagePar) : parseInt(pagePar) + 1;
-    goto(searchPar, pageSizePar, page);
-  }
-
-  const prevPage = () => {
-    const page = parseInt(pagePar) === 0 ? parseInt(pagePar) : parseInt(pagePar) - 1;
-    goto(searchPar, pageSizePar, page);
-  }
-
-  const firstPage = () => {
-    goto(searchPar, pageSizePar, 0);
-  };
-
-  const lastPage = () => {
-    goto(searchPar, pageSizePar, maxPage);
-  };
 
   useMemo(() => {
-    if (pagePar > maxPage)
-      goto(searchPar, pageSizePar, maxPage);
-  }, [searchPar, pageSizePar, pagePar, maxPage])
+    setPrms({ search: N0N, size: PAGE_SIZE, page: 0, ...par });
+  }, [par]);
 
   useMemo(() => {
-    goto(search, pageSizePar, pagePar);
-  }, [search, pageSizePar, pagePar]);
+    const src = search === "" ? N0N : search;
+    window.location.replace(BaseURL + src + "/" + prms.size + "/" + prms.page);
+  }, [search, prms]);
 
-  const oldSearch = useRef(searchPar);
+  useMemo(() => {
+    const last = result.recordCount % prms.size > 0 ? Math.floor(result.recordCount / prms.size) : Math.floor(result.recordCount / prms.size - 1);
+    const prev = parseInt(prms.page) > 0 ? parseInt(prms.page) - 1 : parseInt(prms.page);
+    const next = parseInt(prms.page) < last ? parseInt(prms.page) + 1 : parseInt(prms.page);
+    setNavi({
+      first: BaseURL + prms.search + "/" + prms.size + "/" + 0,
+      prev: BaseURL + prms.search + "/" + prms.size + "/" + prev,
+      info: "Page " + (parseInt(prms.page) + 1) + " of " + (last + 1),
+      next: BaseURL + prms.search + "/" + prms.size + "/" + next,
+      last: BaseURL + prms.search + "/" + prms.size + "/" + last
+    })
+  }, [prms, result.recordCount]);
+
+  useMemo( () => {
+    const src = N0N === prms.search ? "" : prms.search;
+    setSearch(src);
+  },[prms.search]);
 
   useEffect(() => {
-    const dt = oldSearch.current===searchPar ? 60 : 800;
-    oldSearch.current = searchPar;
     const timer = setTimeout(() => {
-      fetchData();
-    }, dt );
+      (async () => {
+        await Axios.post("", foodList(N0N === prms.search ? "" : prms.search, prms.size, prms.page * prms.size)).then((ret) => {
+          if (ret.data.OK) {
+            setResult(ret.data);
+            //setLastPage( ret.data.recordCount % prms.size > 0 ? Math.floor(ret.data.recordCount / prms.size) : Math.floor(ret.data.recordCount / prms.size - 1));
+          }
+        });
+      })();
+    }, 1);
     return () => clearTimeout(timer);
-  }, [searchPar, pageSizePar, pagePar, fetchData]);
-  
-  useMemo( () => {
-    const src = N0N === searchPar ? "" : searchPar;
-    setSearch(src);
-  },[searchPar]);
-
-  useMemo(() => {
-    let maxim = result.recordCount % pageSizePar > 0 ? Math.floor(result.recordCount / pageSizePar) : Math.floor(result.recordCount / pageSizePar - 1);
-    if(maxim<0) maxim = 0;
-    setMaxPage(maxim);
-  }, [result.recordCount, pageSizePar, setMaxPage]);
+  }, [prms]);
 
   const Pagi = () => (
-    <Pagination hidden={result.recordCount <= pageSizePar} style={{ marginTop: "10px" }}>
-      <Pagination.First onClick={() => firstPage()} />
-      <Pagination.Prev onClick={() => prevPage()} />
-      <Pagination.Item disabled={true} >Page {parseInt(pagePar) + 1} of {Math.ceil(result.recordCount / pageSizePar)}</Pagination.Item>
-      <Pagination.Next onClick={() => nextPage()} />
-      <Pagination.Last onClick={() => lastPage()} />
+    <Pagination hidden={result.recordCount <= prms.size} style={{ marginTop: "10px" }}>
+      <Pagination.First href={navi.first} />
+      <Pagination.Prev href={navi.prev} />
+      <Pagination.Item disabled={true} >{navi.info}</Pagination.Item>
+      <Pagination.Next href={navi.next} />
+      <Pagination.Last href={navi.last} />
     </Pagination>
   );
 
@@ -115,6 +94,9 @@ const Foods = () => {
         <Navbar.Collapse id="basic-navbar-nav">
           <Container className=" fluid" >
             <Row>
+              <BackButton>Back</BackButton>
+            </Row>
+            <Row>
               <Form inline >
                 <FormControl type="text" placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} />
                 <FormText style={{ marginLeft: "10px" }}>
@@ -123,6 +105,7 @@ const Foods = () => {
               </Form>
             </Row>
             <Row>
+              {/* <Button className="btn btn-primary" href={RelURL+"ma/5/2"}>Test</Button> */}
               <Pagi />
             </Row>
           </Container>
@@ -159,7 +142,8 @@ const Foods = () => {
             </Card.Body>
           </Card>
         ))}
-        {/* <ReactJson src={par} /> */}
+        {/* <ReactJson src={par} />
+        <ReactJson src={navi} /> */}
       </Container>
     </>
   );
