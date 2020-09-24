@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { Card, Container, Col, Row, Pagination, Navbar, Form, FormControl, FormText } from "react-bootstrap";
 
 import Axios from "Axios";
@@ -6,7 +6,6 @@ import { useParams } from "react-router-dom";
 import { BackButton } from "components/backButton";
 
 const PAGE_SIZE = 5;
-const N0N = "-none-";
 const BaseURL = "#/foods/"
 
 const foodList = (search, pgSize, offset) => ({
@@ -30,63 +29,55 @@ const foodList = (search, pgSize, offset) => ({
 });
 
 const Foods = () => {
-  const par = useParams();
-
+  const { size = PAGE_SIZE, page = 0, search = '' } = useParams();
   const [navi, setNavi] = useState({});
-  const [prms, setPrms] = useState({});
   const [result, setResult] = useState({ OK: false, count: 0, data: [] });
-  const [search, setSearch] = useState("");
+  
+  const goto = (ps, pg, sr) => {
+    window.location.replace(BaseURL + ps + "/" + pg + "/" + sr);
+  }
 
-  useMemo(() => {
-    setPrms({ search: N0N, size: PAGE_SIZE, page: 0, ...par });
-  }, [par]);
-
-  useMemo(() => {
-    const src = search === "" ? N0N : search;
-    window.location.replace(BaseURL + src + "/" + prms.size + "/" + prms.page);
-  }, [search, prms]);
-
-  useMemo(() => {
-    const last = result.recordCount % prms.size > 0 ? Math.floor(result.recordCount / prms.size) : Math.floor(result.recordCount / prms.size - 1);
-    const prev = parseInt(prms.page) > 0 ? parseInt(prms.page) - 1 : parseInt(prms.page);
-    const next = parseInt(prms.page) < last ? parseInt(prms.page) + 1 : parseInt(prms.page);
-    setNavi({
-      first: BaseURL + prms.search + "/" + prms.size + "/" + 0,
-      prev: BaseURL + prms.search + "/" + prms.size + "/" + prev,
-      info: "Page " + (parseInt(prms.page) + 1) + " of " + (last + 1),
-      next: BaseURL + prms.search + "/" + prms.size + "/" + next,
-      last: BaseURL + prms.search + "/" + prms.size + "/" + last
-    })
-  }, [prms, result.recordCount]);
-
-  useMemo( () => {
-    const src = N0N === prms.search ? "" : prms.search;
-    setSearch(src);
-  },[prms.search]);
+  const changeHandle = (txt) => {
+    goto( size, page, txt);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
       (async () => {
-        await Axios.post("", foodList(N0N === prms.search ? "" : prms.search, prms.size, prms.page * prms.size)).then((ret) => {
+        await Axios.post("", foodList( search,  size,  page * size)).then((ret) => {
           if (ret.data.OK) {
             setResult(ret.data);
-            //setLastPage( ret.data.recordCount % prms.size > 0 ? Math.floor(ret.data.recordCount / prms.size) : Math.floor(ret.data.recordCount / prms.size - 1));
+            const last = result.recordCount %  size > 0 ? Math.floor(result.recordCount /  size) : Math.floor(result.recordCount /  size - 1);
+            const prev = parseInt( page) > 0 ? parseInt( page) - 1 : parseInt( page);
+            const next = parseInt( page) < last ? parseInt( page) + 1 : parseInt( page);
+            setNavi({
+              first: BaseURL + size + "/" + 0 + "/" + search,
+              prev: BaseURL +  size + "/" + prev+ "/" + search,
+              info: "Page " + (parseInt( page) + 1) + " of " + (last + 1),
+              next: BaseURL + size + "/" + next+ "/" + search,
+              last: BaseURL + size + "/" + last+ "/" + search
+            });
+            if( page>result.recordCount)
+              goto( size, 0, search );
           }
         });
       })();
     }, 1);
     return () => clearTimeout(timer);
-  }, [prms]);
+  }, [ page, search, size, result.recordCount]);
 
-  const Pagi = () => (
-    <Pagination hidden={result.recordCount <= prms.size} style={{ marginTop: "10px" }}>
-      <Pagination.First href={navi.first} />
-      <Pagination.Prev href={navi.prev} />
-      <Pagination.Item disabled={true} >{navi.info}</Pagination.Item>
-      <Pagination.Next href={navi.next} />
-      <Pagination.Last href={navi.last} />
-    </Pagination>
-  );
+  const Pagi = memo((props) => {
+    const { navi, recordCount } = props
+    return(
+      <Pagination hidden={recordCount <= navi.size} style={{ marginTop: "10px" }}>
+        <Pagination.First href={navi.first} />
+        <Pagination.Prev href={navi.prev} />
+        <Pagination.Item disabled={true} >{navi.info}</Pagination.Item>
+        <Pagination.Next href={navi.next} />
+        <Pagination.Last href={navi.last} />
+      </Pagination>
+     );
+  });
 
   return (
     <>
@@ -98,7 +89,7 @@ const Foods = () => {
             </Row>
             <Row>
               <Form inline >
-                <FormControl type="text" placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} />
+                <FormControl type="text" placeholder="Search" value={search} onChange={e => changeHandle(e.target.value)} />
                 <FormText style={{ marginLeft: "10px" }}>
                   Items found: {result.recordCount}
                 </FormText>
@@ -106,7 +97,7 @@ const Foods = () => {
             </Row>
             <Row>
               {/* <Button className="btn btn-primary" href={RelURL+"ma/5/2"}>Test</Button> */}
-              <Pagi />
+              <Pagi navi={{...navi, recordCount:result.recordCount}} />
             </Row>
           </Container>
         </Navbar.Collapse>
@@ -142,8 +133,8 @@ const Foods = () => {
             </Card.Body>
           </Card>
         ))}
-        {/* <ReactJson src={par} />
-        <ReactJson src={navi} /> */}
+        {/* <ReactJson src={prms} /> */}
+        {/* <ReactJson src={navi} /> */}
       </Container>
     </>
   );

@@ -79,7 +79,10 @@ function App() {
           <Route path="/queries">
             <Queries />
           </Route>
-          <Route path="/foods/:search/:size/:page">
+          <Route path="/foods/:size/:page/:search">
+            <Foods />
+          </Route>
+          <Route path="/foods/:size/:page">
             <Foods />
           </Route>
           <Route path="/foods">
