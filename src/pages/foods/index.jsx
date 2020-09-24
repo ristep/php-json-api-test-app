@@ -6,7 +6,6 @@ import { useParams } from "react-router-dom";
 import { BackButton } from "components/backButton";
 
 const PAGE_SIZE = 5;
-const N0N = "-none-";
 const BaseURL = "#/foods/"
 
 const foodList = (search, pgSize, offset) => ({
@@ -31,13 +30,10 @@ const foodList = (search, pgSize, offset) => ({
 
 const Foods = () => {
   const { size = PAGE_SIZE, page = 0, search = '' } = useParams();
-
   const [navi, setNavi] = useState({});
   const [result, setResult] = useState({ OK: false, count: 0, data: [] });
-  // const [searcht, setSearcht] = useState("");
-
+  
   const goto = (ps, pg, sr) => {
-    // const src = sr === "" ? N0N : sr;
     window.location.replace(BaseURL + ps + "/" + pg + "/" + sr);
   }
 
