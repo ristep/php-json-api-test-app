@@ -32,6 +32,7 @@ function App() {
   useEffect(() => {
     let ndx = parseInt(localStorage.getItem("styleIndex"));
     if (ndx > 0) setStyleIndex(ndx);
+    document.title = `API test app`;
   }, []);
 
   const handleButtonClick = () => {

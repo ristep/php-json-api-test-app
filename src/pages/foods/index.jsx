@@ -4,11 +4,12 @@ import { Card, Container, Col, Row, Pagination, Navbar, Form, FormControl, FormT
 import Axios from "Axios";
 import { useParams } from "react-router-dom";
 import { BackButton } from "components/backButton";
+import NaviGator from "components/navigator";
 
 const PAGE_SIZE = 5;
-const BaseURL = "#/foods/"
+const BaseUrl = "#/foods/"
 
-const foodList = (search, pgSize, offset) => ({
+const foodListQuery = (search, pgSize, offset) => ({
   MetaList: {
     type: "foods",
     attributes: [
@@ -30,54 +31,27 @@ const foodList = (search, pgSize, offset) => ({
 
 const Foods = () => {
   const { size = PAGE_SIZE, page = 0, search = '' } = useParams();
-  const [navi, setNavi] = useState({});
   const [result, setResult] = useState({ OK: false, count: 0, data: [] });
   
   const goto = (ps, pg, sr) => {
-    window.location.replace(BaseURL + ps + "/" + pg + "/" + sr);
+    window.location.replace(BaseUrl + ps + "/" + pg + "/" + sr);
   }
 
-  const changeHandle = (txt) => {
-    goto( size, page, txt);
-  };
-
   useEffect(() => {
+    const dt = 500;
     const timer = setTimeout(() => {
       (async () => {
-        await Axios.post("", foodList( search,  size,  page * size)).then((ret) => {
+        await Axios.post("", foodListQuery( search,  size,  page * size)).then((ret) => {
           if (ret.data.OK) {
             setResult(ret.data);
-            const last = result.recordCount %  size > 0 ? Math.floor(result.recordCount /  size) : Math.floor(result.recordCount /  size - 1);
-            const prev = parseInt( page) > 0 ? parseInt( page) - 1 : parseInt( page);
-            const next = parseInt( page) < last ? parseInt( page) + 1 : parseInt( page);
-            setNavi({
-              first: BaseURL + size + "/" + 0 + "/" + search,
-              prev: BaseURL +  size + "/" + prev+ "/" + search,
-              info: "Page " + (parseInt( page) + 1) + " of " + (last + 1),
-              next: BaseURL + size + "/" + next+ "/" + search,
-              last: BaseURL + size + "/" + last+ "/" + search
-            });
-            if( page>result.recordCount)
-              goto( size, 0, search );
+            if( page*size>result.recordCount)
+                goto( size, 0, search );
           }
         });
       })();
-    }, 1);
+    }, dt );
     return () => clearTimeout(timer);
-  }, [ page, search, size, result.recordCount]);
-
-  const Pagi = memo((props) => {
-    const { navi, recordCount } = props
-    return(
-      <Pagination hidden={recordCount <= navi.size} style={{ marginTop: "10px" }}>
-        <Pagination.First href={navi.first} />
-        <Pagination.Prev href={navi.prev} />
-        <Pagination.Item disabled={true} >{navi.info}</Pagination.Item>
-        <Pagination.Next href={navi.next} />
-        <Pagination.Last href={navi.last} />
-      </Pagination>
-     );
-  });
+  },[ page, search, size, result.recordCount ]);
 
   return (
     <>
@@ -89,15 +63,14 @@ const Foods = () => {
             </Row>
             <Row>
               <Form inline >
-                <FormControl type="text" placeholder="Search" value={search} onChange={e => changeHandle(e.target.value)} />
+                <FormControl type="text" placeholder="Search" value={search} onChange={e => goto( size, page, e.target.value)} />
                 <FormText style={{ marginLeft: "10px" }}>
                   Items found: {result.recordCount}
                 </FormText>
               </Form>
             </Row>
-            <Row>
-              {/* <Button className="btn btn-primary" href={RelURL+"ma/5/2"}>Test</Button> */}
-              <Pagi navi={{...navi, recordCount:result.recordCount}} />
+            <Row  style={{ marginTop: "10px" }}>
+              <NaviGator controls={{BaseUrl,size,page,search,totalCount:result.recordCount}}/>
             </Row>
           </Container>
         </Navbar.Collapse>
@@ -133,8 +106,7 @@ const Foods = () => {
             </Card.Body>
           </Card>
         ))}
-        {/* <ReactJson src={prms} /> */}
-        {/* <ReactJson src={navi} /> */}
+
       </Container>
     </>
   );
