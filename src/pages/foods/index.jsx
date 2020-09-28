@@ -8,6 +8,7 @@ import NaviGator from "components/naviGator";
 import FoodCard from "components/foodCard";
 
 const PAGE_SIZE = 5;
+const DT = 250;
 const BaseUrl = "#/foods/"
 
 const foodListQuery = (search, pgSize, offset) => ({
@@ -39,7 +40,7 @@ const Foods = () => {
   }
 
   useEffect(() => {
-    const dt = 500;
+    const dt = DT;
     const timer = setTimeout(() => {
       (async () => {
         await Axios.post("", foodListQuery(search, size, page * size)).then((ret) => {

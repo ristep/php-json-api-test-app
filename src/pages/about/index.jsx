@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import toc from 'remark-toc';
-// import Markdown from './mark/with-html';
-// import CodeBlock from './mark/code-block';
 import Markdown from 'react-markdown';
 
 import { Card } from "react-bootstrap";
@@ -13,18 +11,15 @@ const AboutPage = () =>{
   useEffect(() => {
       fetch(url)
         .then(function (response) {
-          // console.log(url + " -> " + response.ok);
           if(response.ok){
             return response.text();
           }
           throw new Error('Error message.');
         })
         .then(function (data) {
-          //console.log("data: ", data);
           setMarkdown( data );
         })
         .catch(function (err) {
-          // console.log("failed to load ", url, err.message);
       });
   }, [url])
 
@@ -36,7 +31,6 @@ const AboutPage = () =>{
             source={markdown}
             skipHtml={false}
             escapeHtml={false}
-            // renderers={{code: CodeBlock}}
             plugins={[toc]}
           />
         </Card>

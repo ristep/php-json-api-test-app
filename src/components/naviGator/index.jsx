@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Pagination } from "react-bootstrap";
 
 const NaviGator = (props) => {
@@ -11,13 +11,14 @@ const last = tc %  sz > 0 ? Math.floor(tc / sz) : Math.floor(tc / sz - 1);
 const prev = pg > 0 ? pg - 1 : pg;
 const next = pg < last ? pg + 1 : pg;
 
-const navi = {
+const navi = useMemo( () => 
+  ({
     first: BaseUrl + size + "/" + 0 + "/" + search,
     prev: BaseUrl +  size + "/" + prev+ "/" + search,
     info: "Page " + (pg + 1) + " of " + (last + 1),
     next: BaseUrl + size + "/" + next+ "/" + search,
     last: BaseUrl + size + "/" + last+ "/" + search
-  };
+  }), [BaseUrl, last, next, pg, prev, search, size]);
 
 return(
     <Pagination>
