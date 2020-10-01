@@ -10,7 +10,7 @@ const foodDetailQuery = (id) => (
       "type": "foods",
       "id": id,
       "attributes": [
-        "id", "name", "description", "name_scientific", "wikipedia_id", "food_group", "food_subgroup", "food_type", "public_id"
+        "id", "name", "description", "name_scientific", "wikipedia_id", "food_group", "food_subgroup", "food_type", "public_id", "picture_url"
       ],
     }
   });
@@ -31,7 +31,7 @@ const Food = () => {
     <Card>
       <Card.Body>
         <Card.Title><h2>{food.name}</h2></Card.Title>
-        <Card.Img src={Axios.defaults.baseURL + "img/" + food.id + ".png"} />
+        <Card.Img src={Axios.defaults.baseURL + food.picture_url } />
         <Card.Text component={'span'}>
           <dl className="row">
 

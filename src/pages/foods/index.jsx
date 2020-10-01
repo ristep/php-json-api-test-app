@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Container, Row, Navbar, Form, FormControl, FormText } from "react-bootstrap";
+import { Container, Row, Navbar, Form, FormControl, Button } from "react-bootstrap";
 
 import Axios from "Axios";
 import { useParams } from "react-router-dom";
-import { BackButton } from "components/backButton";
 import NaviGator from "components/naviGator";
 import FoodCard from "components/foodCard";
 
@@ -15,7 +14,7 @@ const foodListQuery = (search, pgSize, offset) => ({
   MetaList: {
     type: "foods",
     attributes: [
-      "id", "name", "description", "name_scientific", "wikipedia_id", "food_group", "food_subgroup", "food_type", "public_id"
+      "id", "name", "description", "name_scientific", "wikipedia_id", "food_group", "food_subgroup", "food_type", "public_id", "picture_url"
     ],
     filter: {
       template: "name like :par1 or name_scientific like :par2",
@@ -34,8 +33,9 @@ const foodListQuery = (search, pgSize, offset) => ({
 const Foods = () => {
   const { size = PAGE_SIZE, page = 0, search = '' } = useParams();
   const [result, setResult] = useState({ OK: false, count: 0, data: [] });
+  // const [ imageList, setImageList] = useState([]);
 
-  const goto = (ps, pg, sr) => {
+  const location = (ps, pg, sr) => {
     window.location.replace(BaseUrl + ps + "/" + pg + "/" + sr);
   }
 
@@ -47,7 +47,7 @@ const Foods = () => {
           if (ret.data.OK) {
             setResult(ret.data);
             if (page * size > result.recordCount)
-              goto(size, 0, search);
+              location(size, 0, search);
           }
         });
       })();
@@ -61,18 +61,21 @@ const Foods = () => {
         <Navbar.Collapse id="basic-navbar-nav">
           <Container className=" fluid" >
             <Row>
-              <BackButton>Back</BackButton>
-            </Row>
-            <Row>
               <Form inline >
-                <FormControl type="text" placeholder="Search" value={search} onChange={e => goto(size, page, e.target.value)} />
-                <FormText style={{ marginLeft: "10px" }}>
+                <FormControl type="text" placeholder="Search" value={search} onChange={e => location(size, page, e.target.value)} />
+                <Button className="btn-light" disabled style={{ marginLeft: "10px" }}>
                   Items found: {result.recordCount}
-                </FormText>
+                </Button>
               </Form>
             </Row>
             <Row style={{ marginTop: "10px" }}>
               <NaviGator controls={{ BaseUrl, size, page, search, totalCount: result.recordCount }} />
+            </Row>
+            <Row>
+              <button className="btn btn-light" disabled>Page size:</button>
+              <button onClick={() => location(  5, page, search )} className="btn btn-outline-primary" >5</button>
+              <button onClick={() => location( 10, page, search )} className="btn btn-outline-primary">10</button>
+              <button onClick={() => location( 15, page, search )} className="btn btn-outline-primary">15</button>
             </Row>
           </Container>
         </Navbar.Collapse>
@@ -85,7 +88,7 @@ const Foods = () => {
             id: variant.id,
             publicId: variant.public_id,
             name: variant.name,
-            imgUrl: Axios.defaults.baseURL + "img/" + variant.id + ".png",
+            imgUrl: Axios.defaults.baseURL + variant.picture_url,
             nameScientific: variant.name_scientific,
             foodGroup: variant.food_group,
             foodSubgroup: variant.food_subgroup
